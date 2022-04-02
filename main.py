@@ -1,21 +1,42 @@
 from typing import Optional
-from pydantic import BaseModel
+from enum import Enum
+
+from pydantic import BaseModel,Field
 
 from fastapi import FastAPI,Body, Path, Query
 
 app = FastAPI()
 
 #Models
+class HairColor(Enum):
+    white = "white"
+    brown = "brown"
+    black = "black"
+    yellow = "blonde"
+    red = "red"
 
-class person(BaseModel):
-    first_name : str
-    last_name : str
-    age : int
-    hair_color : Optional[str] = None
-    is_married : Optional[bool] = None
+
+class Person(BaseModel):
+    first_name : str = Field(
+        ...,
+        min_length= 1,
+        max_length= 50,
+    )
+    last_name : str = Field(
+        ...,
+        min_length= 1,
+        max_length= 50,
+    )
+    age : int = Field(
+        ...,
+        gt= 0,
+        lt= 115
+    )
+    hair_color : Optional[HairColor] = Field(default=None)
+    is_married : Optional[bool] = Field(default=None)
 
 
-class location (BaseModel):
+class Location (BaseModel):
     city : str
     state : str
     country : str
@@ -32,7 +53,7 @@ def platzi():
 #request and response body
 
 @app.post("/person/new")
-def create_person(person : person = Body(...)):
+def create_person(person : Person = Body(...)):
     return person
 
 #validaciones query parameters
@@ -76,12 +97,13 @@ def update_person(
         description = "this is the person id",
         gt = 0
     ),
-    person : person = Body(
+    person : Person = Body(
         ...
     ),
-    location : location = Body(
+    location : Location = Body(
         ...
     )
 ):
-    results = person.dict().update(location.dict())
+    results = person.dict()
+    results.update(location.dict())
     return results
