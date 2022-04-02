@@ -1,7 +1,9 @@
 from typing import Optional
 from enum import Enum
+from datetime import date
 
-from pydantic import BaseModel,Field
+
+from pydantic import BaseModel, EmailStr,Field, ListUniqueItemsError
 
 from fastapi import FastAPI,Body, Path, Query
 
@@ -21,25 +23,63 @@ class Person(BaseModel):
         ...,
         min_length= 1,
         max_length= 50,
+        example = "Luis"
     )
     last_name : str = Field(
         ...,
         min_length= 1,
         max_length= 50,
+        example = "Pozo"
     )
     age : int = Field(
         ...,
         gt= 0,
-        lt= 115
+        lt= 115,
+        example = 15
     )
-    hair_color : Optional[HairColor] = Field(default=None)
-    is_married : Optional[bool] = Field(default=None)
-
+    email : EmailStr = Field(
+        ...
+    )
+    birth_date : date = Field(
+        ...
+    )
+    hair_color : Optional[HairColor] = Field(default=None, example = "black")
+    is_married : Optional[bool] = Field(default=None, example = "True")
+    class Config:
+        schema_extra = {
+            "example" : {
+                "first_name" : "Luis",
+                "last_name" : "Pozo",
+                "age" : "23",
+                "hair_color" : "black",
+                "is_married" : "True"
+            }
+        }
 
 class Location (BaseModel):
-    city : str
-    state : str
-    country : str
+    city : str = Field(
+        ...,
+        max_length=50,
+        min_length=1
+        )
+    state : str = Field(
+        ...,
+        max_length=50,
+        min_length=1
+        )
+    country : str = Field(
+        ...,
+        max_length=50,
+        min_length=1
+        )
+    class Config:
+        schema_extra = {
+            "example" : {
+                "city" : "example",
+                "state": "example",
+                "country":"examlp"
+            }
+        }
 
 
 @app.get("/")
@@ -106,4 +146,4 @@ def update_person(
 ):
     results = person.dict()
     results.update(location.dict())
-    return results
+    return person
