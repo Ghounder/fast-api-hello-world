@@ -3,7 +3,7 @@ from enum import Enum
 from datetime import date
 
 
-from pydantic import BaseModel, EmailStr,Field, ListUniqueItemsError
+from pydantic import BaseModel, EmailStr,Field
 
 from fastapi import FastAPI,Body, Path, Query
 
@@ -105,12 +105,14 @@ def show_person(
         min_length = 1,
         max_length = 50,
         title = "person name",
-        description = "This is the person name , between 1 to 50 char"
+        description = "This is the person name , between 1 to 50 char",
+        example="Lucas"
         ),
     age : int = Query(
         ...,
         title = "person age",
-        description = "this is the person age, is required"
+        description = "this is the person age, is required",
+        example=25
         )    
 ):
     return {name : age}
@@ -123,7 +125,8 @@ def show_person(
         ...,
         gt = 0,
         title = "person id",
-        description = "this is the id of the person"
+        description = "this is the id of the person",
+        example=123
         )
 ):
     return { person_id : "exists"}
@@ -135,7 +138,8 @@ def update_person(
         ...,
         title = "person id",
         description = "this is the person id",
-        gt = 0
+        gt = 0,
+        example=1345
     ),
     person : Person = Body(
         ...
