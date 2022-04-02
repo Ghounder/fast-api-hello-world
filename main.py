@@ -1,7 +1,8 @@
+from ast import Str
 from typing import Optional
 from pydantic import BaseModel
 
-from fastapi import FastAPI,Body
+from fastapi import FastAPI,Body, Query
 
 app = FastAPI()
 
@@ -27,3 +28,12 @@ def platzi():
 @app.post("/person/new")
 def create_person(person : person = Body(...)):
     return person
+
+#validaciones query parameters
+
+@app.get("/person/detail")
+def show_person(
+    name : Optional[str] = Query(None, min_length = 1, max_length = 50),
+    age : int = Query(...)    
+):
+    return {name : age}
