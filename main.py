@@ -14,6 +14,13 @@ class person(BaseModel):
     hair_color : Optional[str] = None
     is_married : Optional[bool] = None
 
+
+class location (BaseModel):
+    city : str
+    state : str
+    country : str
+
+
 @app.get("/")
 def home():
     return { "Hello" : "World"}
@@ -59,3 +66,22 @@ def show_person(
         )
 ):
     return { person_id : "exists"}
+#validations request body
+
+@app.put("/person/{person_id}")
+def update_person(
+    person_id : int = Path(
+        ...,
+        title = "person id",
+        description = "this is the person id",
+        gt = 0
+    ),
+    person : person = Body(
+        ...
+    ),
+    location : location = Body(
+        ...
+    )
+):
+    results = person.dict().update(location.dict())
+    return results
